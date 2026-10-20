@@ -10,94 +10,82 @@ var products = [
 
 var cart = [];
 
-// Display all products
-function showProducts(list) {
+// Show products
+function showProducts() {
     var html = "";
 
-    for (var i = 0; i < list.length; i++) {
-        html += `
-        <div class="col-6 col-lg-4">
-            <div class="card h-100">
-                <img src="${list[i].img}" alt="${list[i].name}">
-                <div class="card-body">
-                    <h5>${list[i].name}</h5>
-                    <p>Rs. ${list[i].price}</p>
-                    <button onclick="addCart('${list[i].name}')">
-                        Add to Bag +
-                    </button>
-                </div>
-            </div>
-        </div>`;
+    for (var i = 0; i < products.length; i++) {
+        html += '<div class="col-6 col-lg-4"><div class="card">';
+        html += '<img src="' + products[i].img + '">';
+        html += '<div class="card-body">';
+        html += '<h5>' + products[i].name + '</h5>';
+        html += '<p>Rs. ' + products[i].price + '</p>';
+        html += '<button onclick="addCart(' + i + ')">Add to Bag +</button>';
+        html += '</div></div></div>';
     }
 
     document.getElementById("products").innerHTML = html;
 }
 
-// Show products when page opens
-showProducts(products);
+showProducts();
 
-// Add product to cart
-function addCart(name) {
-    var found = false;
+// Add product
+function addCart(i) {
+    var found = -1;
 
-    for (var i = 0; i < cart.length; i++) {
-        if (cart[i].name == name) {
-            cart[i].qty++;
-            found = true;
+    for (var j = 0; j < cart.length; j++) {
+        if (cart[j].name == products[i].name) {
+            found = j;
         }
     }
 
-    if (found == false) {
-        for (var i = 0; i < products.length; i++) {
-            if (products[i].name == name) {
-                cart.push({
-                    name: products[i].name,
-                    price: products[i].price,
-                    qty: 1
-                });
-            }
-        }
+    if (found == -1) {
+        var item = {
+            name: products[i].name,
+            price: products[i].price,
+            qty: 1
+        };
+
+        cart[cart.length] = item;
+    } else {
+        cart[found].qty = cart[found].qty + 1;
     }
 
     showCart();
 }
 
-// Update cart and total
+// Show cart
 function showCart() {
     var html = "";
-    var count = 0;
     var total = 0;
 
     for (var i = 0; i < cart.length; i++) {
-        var p = cart[i];
+        var name = cart[i].name;
+        var price = cart[i].price;
+        var qty = cart[i].qty;
+        var subtotal = price * qty;
 
-        count = count + p.qty;
-        total = total + p.price * p.qty;
+        total = total + subtotal;
 
-        html += `
-        <div class="cart-item">
-            ${p.name} - Rs. ${p.price}<br>
-
-            <button onclick="changeQty(${i}, -1)">−</button>
-
-            ${p.qty}
-
-            <button onclick="changeQty(${i}, 1)">+</button>
-
-            Subtotal: Rs. ${p.price * p.qty}
-        </div>`;
+        html += '<div class="cart-item">';
+        html += name + '<br>';
+        html += 'Price: Rs. ' + price + '<br>';
+        html += '<button onclick="changeQty(' + i + ',-1)">-</button>';
+        html += ' ' + qty + ' ';
+        html += '<button onclick="changeQty(' + i + ',1)">+</button><br>';
+        html += 'Subtotal: Rs. ' + subtotal;
+        html += '</div>';
     }
 
-    if (html == "") {
+    if (cart.length == 0) {
         html = "Your bag is empty.";
     }
 
     document.getElementById("items").innerHTML = html;
-    document.getElementById("count").textContent = count;
-    document.getElementById("total").textContent = total;
+    document.getElementById("total").innerHTML = total;
 }
 
-// Increase or decrease quantity
+// Change quantity
 function changeQty(i, amount) {
     cart[i].qty = cart[i].qty + amount;
 
@@ -107,3 +95,5 @@ function changeQty(i, amount) {
 
     showCart();
 }
+
+showCart();
